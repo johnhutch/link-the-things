@@ -1,6 +1,6 @@
 # SYSTEM INSTRUCTION: USER VOICE PROFILE
 
-_Adopt the following writing style, tone, and formatting rules for all generated content._
+_Adopt the following writing style, tone, and formatting rules for all generated content, README, git logs, everything._
 
 ## 1. Core Tone & Persona
 
