@@ -59,26 +59,26 @@ the authoring form mirrors that order so the user's muscle memory carries over.
 - ✅ `rails new` — PostgreSQL + Sass (dartsass-rails on Propshaft, Rails 8)
 - ✅ SMACSS stylesheet structure, compiling clean
 - ✅ Project docs (README, CLAUDE.md, this plan)
-- ⬜ **RSpec + Capybara + factory_bot** installed; `rails_helper` configured for
-  system specs (headless + a mobile-viewport driver). Green `bin/rspec` on an
-  empty suite is the gate to leave Phase 0.
+- ✅ **RSpec + Capybara + factory_bot** installed; generators locked to rspec.
+  (System-spec mobile-viewport driver still to configure when system specs land.)
 - ⬜ **Render deploy wired early** — `render.yaml` (web service + managed
   Postgres), auto-deploy on push to `main`. Deploy the empty app *now* so we
   never hit a "works locally only" wall at the end.
-- ⬜ Seed the single superuser (env-driven creds, not committed).
+- ⬜ Seed the single superuser (env-driven creds, not committed). *(Unblocked
+  once Devise lands — see Phase 1.)*
 
-## Phase 1 — Data model + auth ⬜
+## Phase 1 — Data model + auth 🚧
 
 - ⬜ **Devise**, superuser only. No public sign-up route. Creation/editing is
   gated; everything player-facing is open.
-- ⬜ Migrations + models for `Puzzle` and `Group` per the schema above.
-- ⬜ Validations — the rules the form *and* the importer both lean on:
-  - exactly 4 groups per puzzle
-  - exactly 4 words per group
+- ✅ Migrations + models for `Puzzle`, `Group`, and `Attempt` per the schema.
+- ✅ Validations — the rules the form *and* the importer both lean on:
+  - exactly 4 groups per puzzle *(enforced on publish)*
+  - exactly 4 words per group *(enforced on publish)*
   - the 4 colors are present and unique within a puzzle
   - `share_token` generated on create, unique
-- ⬜ Specs: model validations (the 4×4 rules are the heart of correctness),
-  factories that build a valid 4-group puzzle.
+  - mistakes capped at 4 (`Puzzle::MAX_MISTAKES`)
+- ✅ Specs: model validations + factories (incl. a valid `:published_puzzle`).
 
 ## Phase 2 — Authoring (the part that fixes the original pain) ⬜
 
