@@ -80,21 +80,24 @@ the authoring form mirrors that order so the user's muscle memory carries over.
   - mistakes capped at 4 (`Puzzle::MAX_MISTAKES`)
 - ✅ Specs: model validations + factories (incl. a valid `:published_puzzle`).
 
-## Phase 2 — Authoring (the part that fixes the original pain) ⬜
+## Phase 2 — Authoring (the part that fixes the original pain) 🚧
 
-- ⬜ **Creation form** — four color-coded `m-group` blocks in swellgarfo order
+- ✅ **Creation form** — four color-coded `m-group` blocks in swellgarfo order
   (Blue → Green → Yellow → Purple). Per group: **Answers first** (the 4 words),
-  **then Description** — matching swellgarfo's actual field order. Title +
-  Author at the **bottom**, not top.
+  **then Description**. Title + Author at the **bottom**. (Manual save for now;
+  auto-save layers on next.)
+- ✅ `PuzzlesController` + routes, gated by `authenticate_user!`, every query
+  scoped to `current_user` (no cross-user access). `belongs_to :user` wired.
+- ✅ **Superuser dashboard** — drafts + published in one list, drafts wearing the
+  `.is-draft` badge. New / edit / delete.
+- ✅ Publish action: draft → published, enforcing the full 4×4 rules.
+- ✅ Request specs: auth gating, draft create, nested groups, publish (complete
+  vs. incomplete), ownership.
 - ⬜ **Auto-save drafts** — the non-negotiable, born from losing work to the iOS
   back button. Debounced Stimulus controller fires a background Turbo save on
-  change; a draft is just a `Puzzle` with `status: draft`. No "save" button
-  anxiety.
+  change. *(Next slice.)*
 - ⬜ Draft resilience spec: partial puzzle (e.g. 2 groups filled) persists and
   reloads intact.
-- ⬜ **Superuser dashboard** — published puzzles + drafts in one list, drafts
-  wearing the `.is-draft` badge. Edit / continue / delete / publish.
-- ⬜ Publish action: draft → published, generates/confirms `share_token`.
 - ⬜ System spec (mobile viewport): author a full puzzle on a phone-sized screen,
   publish, land on the shareable URL.
 
