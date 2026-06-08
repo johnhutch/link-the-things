@@ -93,13 +93,14 @@ the authoring form mirrors that order so the user's muscle memory carries over.
 - ✅ Publish action: draft → published, enforcing the full 4×4 rules.
 - ✅ Request specs: auth gating, draft create, nested groups, publish (complete
   vs. incomplete), ownership.
-- ⬜ **Auto-save drafts** — the non-negotiable, born from losing work to the iOS
-  back button. Debounced Stimulus controller fires a background Turbo save on
-  change. *(Next slice.)*
-- ⬜ Draft resilience spec: partial puzzle (e.g. 2 groups filled) persists and
-  reloads intact.
-- ⬜ System spec (mobile viewport): author a full puzzle on a phone-sized screen,
-  publish, land on the shareable URL.
+- ✅ **Auto-save drafts** — "New puzzle" persists an empty draft immediately, then
+  a debounced Stimulus controller (`autosave_controller.js`) background-PATCHes
+  every change as JSON (`204 No Content`). Title is now publish-only so an
+  untitled draft saves from keystroke one. No save button to remember.
+- ✅ Background-save request spec (JSON PATCH → `204`, change persists).
+- ⬜ System spec (mobile viewport, Capybara + JS driver): author a full puzzle on
+  a phone-sized screen, watch it auto-save, publish, land on the share URL.
+  *(Needs the headless-Chrome driver wired in `rails_helper` — next.)*
 
 ## Phase 3 — Play ⬜
 
