@@ -32,6 +32,41 @@ breaks the new→edit handoff. Publish is the only gate that enforces the full 4
 
 ---
 
+## 0002 — Deploy: self-host on Synology, native dev + Docker prod
+
+**Date:** 2026-06-08
+**Status:** accepted
+
+**Context.** CLAUDE.md originally said Render ("Not Heroku"), but on review the
+owner doesn't want a host with no spending cap for a toy app and already has a
+**Synology DS918+** (RAM upgraded) to run it on — zero marginal cost, no billing
+surprise possible. Accepted tradeoff: if the app ever blows up, migrate then.
+Three forks: build/runtime, how many databases, and how to run jobs. The owner
+isn't anti-Docker, just anti-Docker-as-thoughtless-default; the historical gripe
+(developing *inside* a container) doesn't apply here because **dev stays native**.
+
+**Decision.** **Dev native** on macOS (chruby + Postgres, `bin/rspec` in the real
+shell — unchanged). **Production containerized** via DSM **Container Manager**:
+a `docker-compose.yml` runs the app (the repo's stock Rails 8 Dockerfile, Ruby
+4.0.4 pinned) + a `postgres:17-alpine` service. **CI builds the image** on GitHub
+runners and pushes to **GHCR**; the NAS only ever pulls (the Celeron shouldn't
+compile). A **GitHub Action** ships on push to `main` (build → push → SSH →
+`docker compose pull && up -d`). One **Postgres** backs app + Solid trifecta via
+a shared `DATABASE_URL` (each connection keeps its `migrations_paths`). **Jobs run
+in Puma** (`SOLID_QUEUE_IN_PUMA=true`). **Thruster stays** (HTTP-only) since TLS
+terminates at DSM's reverse proxy + Let's Encrypt; `db:prepare` runs via the
+container entrypoint (creates + seeds on first boot, migrates after). Secrets live
+in a `.env` on the NAS (gitignored) + GitHub repo secrets for the deploy SSH.
+
+**Consequence.** No hosting bill and full control of the Ruby version; in exchange
+the owner runs the box (DSM updates, backups — `pg_dump` via Task Scheduler).
+`docker-compose.yml` and `.env` don't ride the image, so changing them means
+updating the NAS copy by hand. Jobs share the web container — split out a worker
+when volume justifies it. Full runbook in `docs/DEPLOY.md`. Not yet deployed —
+first deploy waits on the one-time NAS setup + GitHub secrets.
+
+---
+
 ## Adding new decisions
 
 Append using the template above. Status is one of: `proposed` | `accepted` | `superseded by NNNN` | `deprecated`.

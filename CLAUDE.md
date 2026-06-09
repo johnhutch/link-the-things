@@ -32,7 +32,10 @@ Don't relitigate these without a reason — they came out of a full grill-me pas
 - **Stats per puzzle:** total attempts, solve rate, mistakes per attempt, common
   wrong guesses, shareable emoji-cube (🟨🟩🟦🟪).
 - **Export:** JSON download per puzzle.
-- **Hosting:** Render, auto-deploy from GitHub on push to `main`. Not Heroku.
+- **Hosting:** self-hosted on a Synology DS918+ via DSM Container Manager. Dev is
+  native (no Docker locally); production is a container image built by CI and
+  pulled by the NAS. Auto-deploy from GitHub on push to `main`. Not Render, not
+  Heroku — see ADR-0002 + `docs/DEPLOY.md`. (Migrate off only if it ever blows up.)
 - **Testing:** RSpec + Capybara, TDD. Write the failing test first.
 
 ## Voice

@@ -1,6 +1,6 @@
 # Build Plan — Link the Things
 
-The full gameplan to get from "Rails scaffold + styles" to "shipped on Render."
+The full gameplan to get from "Rails scaffold + styles" to "shipped on the NAS."
 Phased so every step ships something real and testable. We're going TDD —
 "build X" always means **spec X red, make it green, refactor.** iPhone is the
 primary device, so "works" means "works on a phone."
@@ -64,9 +64,11 @@ the authoring form mirrors that order so the user's muscle memory carries over.
   (`spec/support/capybara.rb`), `js: true` opt-in. Dodges chromedriver/Chrome
   version drift by preferring a Selenium-cached driver whose major matches the
   installed Chrome. Warden `login_as` for browser-session auth.
-- ⬜ **Render deploy wired early** — `render.yaml` (web service + managed
-  Postgres), auto-deploy on push to `main`. Deploy the empty app *now* so we
-  never hit a "works locally only" wall at the end.
+- ✅ **Deploy wired (self-host)** — Synology Container Manager: `docker-compose.yml`
+  (app + Postgres, shared by Solid cache/queue/cable), image built by CI → GHCR,
+  GitHub Action ships on push to `main`, jobs in Puma, entrypoint migrates/seeds.
+  See ADR-0002 + `docs/DEPLOY.md`. *(Config committed; first deploy waits on the
+  one-time NAS setup + GitHub secrets.)*
 - ⬜ Seed the single superuser (env-driven creds, not committed). *(Unblocked
   once Devise lands — see Phase 1.)*
 
@@ -148,7 +150,7 @@ the authoring form mirrors that order so the user's muscle memory carries over.
 - ⬜ **JSON export** per puzzle — download endpoint, stable schema.
 - ⬜ **Mobile pass** — iPhone is *the* device. Real-device check of authoring,
   playing, and sharing. Tap targets, the form's auto-save, the cube copy.
-- ⬜ **Production deploy on Render** + a real end-to-end smoke test: create →
+- ⬜ **Production deploy on the Synology** + a real end-to-end smoke test: create →
   publish → play → see stats → share, on the deployed app.
 
 ---
