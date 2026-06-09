@@ -134,11 +134,11 @@ the authoring form mirrors that order so the user's muscle memory carries over.
 - ⬜ **Per-puzzle stats view** — total attempts, solve rate, mistakes-per-attempt
   distribution, and **common wrong guesses** (derived by aggregating the
   `guesses` jsonb across attempts — no separate table).
-- ⬜ **Emoji result cube** (🟨🟩🟦🟪) — the standard 4×N grid of the tried
-  combinations, built from an attempt's guess rows, with copy-to-clipboard for
-  bragging over text.
-- ⬜ Spec the cube generator hard — it's pure logic (guesses → emoji grid) and
-  the shareable artifact, so it deserves tight unit coverage.
+- ✅ **Emoji result cube** (🟨🟩🟦🟪) — `EmojiCube` value object turns an
+  attempt's `guesses` into the 4×N grid; the attempts endpoint returns it and the
+  game shows it post-play with copy-to-clipboard.
+- ✅ Cube generator spec'd hard — pure logic, 7 unit cases (color mapping, order,
+  empty, symbol/string keys, unknown-color fallback). `spec/models/emoji_cube_spec.rb`.
 
 ## Phase 5 — Import + polish + ship ⬜
 
