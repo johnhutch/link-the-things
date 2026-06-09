@@ -141,14 +141,13 @@ the authoring form mirrors that order so the user's muscle memory carries over.
 - ✅ Cube generator spec'd hard — pure logic, 7 unit cases (color mapping, order,
   empty, symbol/string keys, unknown-color fallback). `spec/models/emoji_cube_spec.rb`.
 
-## Phase 5 — Import + polish + ship ⬜
+## Phase 5 — Import + polish + ship 🚧
 
-- ⬜ **`puzzles:import_obsidian` rake task** — parse the existing archive
-  (`~/.../Connections Puzzles.md`). Formats are **inconsistent across the 8
-  puzzles** (mixed `###`/`####`, comma-separated vs. bulleted words, description
-  placement wanders) — the parser has to be forgiving and normalize on the way
-  in. Idempotent (safe to re-run). Spec it against a fixture of the real messy
-  formats.
+- ✅ **`puzzles:import_obsidian` rake task** — `ObsidianArchive` parses the real
+  archive (forgiving: mixed `##`–`####` levels, color-case, bullet vs. plain,
+  comma-split multi-word answers) and imports idempotently: complete 4×4 puzzles
+  publish, partial ones become drafts, junk is skipped. Hard-spec'd against a
+  fixture of the real formats. First real run: 8 published, 1 draft, 2 skipped.
 - ⬜ **JSON export** per puzzle — download endpoint, stable schema.
 - ⬜ **Mobile pass** — iPhone is *the* device. Real-device check of authoring,
   playing, and sharing. Tap targets, the form's auto-save, the cube copy.
