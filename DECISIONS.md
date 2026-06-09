@@ -98,6 +98,32 @@ feed it and the guess data we get back.
 
 ---
 
+## 0004 — Deploy mechanism: build-and-ship over SSH, no CI/CD
+
+**Date:** 2026-06-09
+**Status:** accepted (supersedes the CI/registry parts of 0002)
+
+**Context.** 0002 wired a GitHub Action to build the image on GitHub runners,
+push to GHCR, and SSH to the NAS. On reflection the owner doesn't want to depend
+on GitHub (or any third party) for deploys — GitHub is just the archive remote.
+The constraints still hold: build off the NAS's weak Celeron, Docker is fine.
+
+**Decision.** A plain `bin/deploy` script: `docker build` on the dev machine
+(pinned `--platform linux/amd64` — the DS918+ is Intel, the Mac is ARM), then
+`docker save | ssh nas docker load`, then `ssh nas "docker compose up -d"`. **No
+registry, no GitHub, no build on the NAS.** Compose references a local
+`link-the-things:latest` with `pull_policy: never`. The GitHub Action and GHCR
+are gone. Everything else from 0002 stands (Docker prod, one Postgres, jobs in
+Puma, DSM reverse proxy for TLS). Runbook: `docs/DEPLOY.md`.
+
+**Consequence.** Deploys are a manual `NAS_SSH=… bin/deploy` from the laptop —
+fine for a toy app, and fully self-reliant. The image moves as a tarball over
+SSH (no registry to run or trust). If deploys ever want to be hands-off, revisit
+Kamal + a self-hosted registry. Not yet run end-to-end — first deploy waits on
+the one-time NAS setup.
+
+---
+
 ## Adding new decisions
 
 Append using the template above. Status is one of: `proposed` | `accepted` | `superseded by NNNN` | `deprecated`.

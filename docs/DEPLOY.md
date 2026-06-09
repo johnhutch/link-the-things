@@ -1,35 +1,47 @@
 # Deploy — Link the Things
 
-Self-hosted on a **Synology DS918+** via DSM **Container Manager**. Dev stays
-native (chruby + Postgres on the Mac); only production is containerized. CI
-builds the image on GitHub's runners and the NAS just pulls it — the Celeron
-never compiles anything. Push to `main` ships it. See ADR-0002 for the why.
+Self-hosted on a **Synology DS918+** via DSM **Container Manager**. No GitHub
+CI/CD, no registry: you build the image on your Mac (fast) and **ship it straight
+to the NAS over SSH** with `bin/deploy`. The Celeron never builds anything. Dev
+stays native (chruby + Postgres on the Mac); only production is containerized.
+See ADR-0002 (containerized prod) and ADR-0004 (build-and-ship). GitHub is just
+the archive remote — nothing deploys from it.
 
 ```
-push to main ─▶ GitHub Action ─▶ build image ─▶ push to GHCR
-                                                     │
-                          SSH to NAS ◀───────────────┘
-                          docker compose pull && up -d
+bin/deploy ─▶ docker build (on the Mac, linux/amd64)
+           ─▶ docker save | ssh nas docker load
+           ─▶ ssh nas: docker compose up -d
 ```
 
 ## One-time setup on the Synology
 
-1. **Enable SSH** — DSM → Control Panel → Terminal & SNMP → Enable SSH service.
-2. **Install Container Manager** from Package Center (gives you `docker` +
+1. **Enable SSH** — Control Panel → Terminal & SNMP → Enable SSH service. Add
+   your Mac's public key to the NAS account's `~/.ssh/authorized_keys` so
+   `bin/deploy` runs without a password prompt.
+2. **Install Container Manager** from Package Center (gives `docker` +
    `docker compose`, usually under `/usr/local/bin`).
-3. **Make a project dir**, e.g. `/volume1/docker/link-the-things`, and put two
+3. **Make the project dir**, e.g. `/volume1/docker/link-the-things`, and put two
    files in it:
    - `docker-compose.yml` (copy from this repo)
    - `.env` (copy `.env.example`, fill in real values — `RAILS_MASTER_KEY` is the
      verbatim contents of `config/master.key`)
-4. **Authenticate to GHCR** so the NAS can pull the image. Either:
-   - make the GHCR package public (GitHub → repo → Packages → package settings),
-     then no login is needed; or
-   - `docker login ghcr.io -u johnhutch` with a Personal Access Token that has
-     `read:packages`.
-5. **First boot:** from the project dir, `docker compose up -d`. The web
-   container's entrypoint runs `db:prepare`, which creates the schema and seeds
-   the superuser from `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
+
+## Deploying
+
+From the repo on your Mac:
+
+```bash
+NAS_SSH=you@your-nas.local bin/deploy
+# optional: NAS_DIR=/volume1/docker/link-the-things (this is the default)
+```
+
+It builds for `linux/amd64` (the DS918+ is Intel — important on Apple Silicon),
+streams the image to the NAS, and restarts the stack. The web container's
+entrypoint runs `db:prepare`, which creates the schema and seeds the superuser
+from `ADMIN_EMAIL` / `ADMIN_PASSWORD` on first boot, and migrates thereafter.
+
+> If `docker compose` isn't on the SSH `PATH`, prefix the remote commands with
+> `export PATH=$PATH:/usr/local/bin` (or symlink it).
 
 ## Expose it (HTTPS)
 
@@ -45,26 +57,6 @@ DSM handles the annoying parts natively:
 
 Rails runs with `force_ssl` + `assume_ssl`, so it trusts the proxy's TLS
 termination and won't redirect-loop.
-
-## GitHub repo secrets (for the deploy Action)
-
-Set these under repo → Settings → Secrets and variables → Actions:
-
-| Secret | Value |
-|--------|-------|
-| `SYNOLOGY_HOST` | NAS hostname / public IP |
-| `SYNOLOGY_USER` | SSH user (a DSM admin account) |
-| `SYNOLOGY_SSH_KEY` | private key whose public half is authorized on the NAS |
-| `SYNOLOGY_SSH_PORT` | SSH port (DSM defaults to 22; change it if you have) |
-| `SYNOLOGY_APP_DIR` | e.g. `/volume1/docker/link-the-things` |
-
-`GITHUB_TOKEN` (for the GHCR push) is provided automatically.
-
-## Routine deploys
-
-Just `git push origin main`. The Action builds, pushes, and rolls the container.
-If you ever change `docker-compose.yml` or `.env`, update the copy on the NAS by
-hand (those don't ride along with the image).
 
 ## Backups
 

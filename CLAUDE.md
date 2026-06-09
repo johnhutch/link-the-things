@@ -34,9 +34,10 @@ Don't relitigate these without a reason — they came out of a full grill-me pas
   wrong guesses, shareable emoji-cube (🟨🟩🟦🟪).
 - **Export:** JSON download per puzzle.
 - **Hosting:** self-hosted on a Synology DS918+ via DSM Container Manager. Dev is
-  native (no Docker locally); production is a container image built by CI and
-  pulled by the NAS. Auto-deploy from GitHub on push to `main`. Not Render, not
-  Heroku — see ADR-0002 + `docs/DEPLOY.md`. (Migrate off only if it ever blows up.)
+  native (no Docker locally); production is a container image built on the dev
+  machine and shipped to the NAS over SSH via `bin/deploy` — **no GitHub CI/CD,
+  no registry** (GitHub is archive-only). Not Render, not Heroku — see ADR-0002
+  + ADR-0004 + `docs/DEPLOY.md`. (Migrate off only if it ever blows up.)
 - **Testing:** RSpec + Capybara, TDD. Write the failing test first.
 
 ## Voice
