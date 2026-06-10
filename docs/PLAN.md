@@ -1,4 +1,4 @@
-# Build Plan — Link the Things
+# Build Plan — Quartets
 
 The full gameplan to get from "Rails scaffold + styles" to "shipped on the NAS."
 Phased so every step ships something real and testable. We're going TDD —

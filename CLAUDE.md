@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Project context and working agreements for Claude Code on **Link the Things**.
+Project context and working agreements for Claude Code on **Quartets**.
 
 ## What this is
 

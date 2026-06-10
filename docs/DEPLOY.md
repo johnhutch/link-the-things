@@ -1,4 +1,4 @@
-# Deploy — Link the Things
+# Deploy — Quartets
 
 Self-hosted on a **Synology DS918+** via DSM **Container Manager**. No GitHub
 CI/CD, no registry: you build the image on your Mac (fast) and **ship it straight
@@ -20,7 +20,7 @@ bin/deploy ─▶ docker build (on the Mac, linux/amd64)
    `bin/deploy` runs without a password prompt.
 2. **Install Container Manager** from Package Center (gives `docker` +
    `docker compose`, usually under `/usr/local/bin`).
-3. **Make the project dir**, e.g. `/volume1/docker/link-the-things`, and put two
+3. **Make the project dir**, e.g. `/volume1/docker/quartets`, and put two
    files in it:
    - `docker-compose.yml` (copy from this repo)
    - `.env` (copy `.env.example`, fill in real values — `RAILS_MASTER_KEY` is the
@@ -32,7 +32,7 @@ From the repo on your Mac:
 
 ```bash
 NAS_SSH=you@your-nas.local bin/deploy
-# optional: NAS_DIR=/volume1/docker/link-the-things (this is the default)
+# optional: NAS_DIR=/volume1/docker/quartets (this is the default)
 ```
 
 It builds for `linux/amd64` (the DS918+ is Intel — important on Apple Silicon),
@@ -60,7 +60,7 @@ termination and won't redirect-loop.
 
 ## Backups
 
-- **Database:** `docker compose exec db pg_dump -U link_the_things
-  link_the_things_production > backup.sql` (cron it via DSM Task Scheduler).
+- **Database:** `docker compose exec db pg_dump -U quartets
+  quartets_production > backup.sql` (cron it via DSM Task Scheduler).
 - The `pgdata` volume also gets swept up by Synology's Hyper Backup if you
   include the Docker volumes path.

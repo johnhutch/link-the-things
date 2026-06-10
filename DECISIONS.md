@@ -112,7 +112,7 @@ The constraints still hold: build off the NAS's weak Celeron, Docker is fine.
 (pinned `--platform linux/amd64` — the DS918+ is Intel, the Mac is ARM), then
 `docker save | ssh nas docker load`, then `ssh nas "docker compose up -d"`. **No
 registry, no GitHub, no build on the NAS.** Compose references a local
-`link-the-things:latest` with `pull_policy: never`. The GitHub Action and GHCR
+`quartets:latest` with `pull_policy: never`. The GitHub Action and GHCR
 are gone. Everything else from 0002 stands (Docker prod, one Postgres, jobs in
 Puma, DSM reverse proxy for TLS). Runbook: `docs/DEPLOY.md`.
 
