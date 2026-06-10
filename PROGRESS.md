@@ -15,6 +15,16 @@ The **Phase 0 Render deploy** is still unwired and worth doing before Phase 3 gr
 
 ## Shipped log (most recent first)
 
+- **Brutalist theme is now site-wide** — promoted `theme-brutal` from an opt-in
+  body class (homepage + styleguide only) to the layout default; a page opts out
+  by setting its own `content_for(:body_class)`. Extended `_brutal.scss` to cover
+  the previously-unthemed modules: puzzle lists (browse + dashboard), stats
+  panels, the author form + category fieldsets, draft badge, flash messages, and
+  interior page headings. Bare `button_to`/`f.submit` buttons picked up the
+  `.m-btn`/`--pop` vocabulary; interior `<h1>`s now run through `multicolor`. One
+  system-spec assertion loosened to a case-insensitive match since the dashboard
+  title is now display-uppercased (CSS, but Selenium reads rendered text). All 45
+  specs green.
 - **Multicolor headers re-roll on every load** — dropped `Multicolor`'s MD5
   seed so colors *and* break positions re-randomize per call (run length now
   3–6). Kills the "frozen purple" look where deterministic seeding pinned a
