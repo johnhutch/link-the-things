@@ -40,10 +40,6 @@ into DECISIONS.md before building Phase 3.
   shareable link to hand out. **Blocked on D1 + D2** (ownership model + the
   auth-gate reversal, which also rewrites the "superuser-only creation"
   decision).
-- **Richer share payload** — the emoji cube copied on completion should also
-  include the puzzle **title** and a **direct link** to the puzzle, not just the
-  🟨🟩🟦🟪 grid. (Lives in `game_controller.js`; the play page knows the
-  share_token / URL.)
 
 ### Auth & accounts
 
@@ -75,8 +71,8 @@ into DECISIONS.md before building Phase 3.
 
 Reasoning lives in the session where this was set; the short version:
 
-1. **Quick wins, no decisions** — richer share payload → extend the
-   author→publish spec to the share URL → auto-save debounce tune.
+1. **Quick wins, no decisions** — extend the author→publish spec to the share
+   URL → auto-save debounce tune.
 2. **Auth polish (works on today's model)** — style login → clean the full
    signup/login flow → wire `recoverable` (per D4) → "view my puzzles" stats
    dashboard (logged-in puzzles already `belong_to` the user, so this needs no
