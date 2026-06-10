@@ -1,6 +1,6 @@
 # Progress
 
-**Last updated:** 2026-06-06
+**Last updated:** 2026-06-09
 **Active branch:** main
 
 Current state + a rolling shipped-log. Planned/not-started work lives in `TODOS.md`; the *why* behind decisions lives in `DECISIONS.md`.
@@ -15,6 +15,12 @@ The **Phase 0 Render deploy** is still unwired and worth doing before Phase 3 gr
 
 ## Shipped log (most recent first)
 
+- **Multicolor headers re-roll on every load** — dropped `Multicolor`'s MD5
+  seed so colors *and* break positions re-randomize per call (run length now
+  3–6). Kills the "frozen purple" look where deterministic seeding pinned a
+  phrase's banding forever. Server-side, zero JS; the contract is headers stay
+  out of `<% cache %>` blocks (an optional `seed:` pins a banding for any future
+  must-cache header). Spec flipped from determinism → re-roll + seed.
 - **Auto-save drafts** — debounced Stimulus controller (`autosave_controller.js`):
   first edit POSTs to mint the draft, then flips the form to PATCH it. Endpoint
   answers quietly (201 + `Location`, then 204). `Puzzle#title` is now publish-only
