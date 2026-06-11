@@ -27,6 +27,26 @@ Planned work that has been scoped but not yet started. Read this at session star
   inline aggregates per row: # of completions, # of *successful* completions, and
   avg mistakes. (Builds on `puzzles#index` + `PuzzleStats`.)
 
+### Bigger features (scoped, not started)
+
+- **Daily auto-featured puzzle** — pick ONE puzzle to feature on the front page
+  for the whole day, for all users; it cycles automatically each day (no manual
+  curation). Add a `last_featured` (date) column to puzzles. Selection picks the
+  first match in this order:
+  1. the never-featured puzzle with the most completions;
+  2. the never-featured puzzle with the most views;
+  3. a never-featured puzzle with a **positive upvote score**;
+  4. the puzzle with the **oldest `last_featured` date**.
+  Replaces today's `RANDOM()` featured pick in `HomeController`. (Depends on the
+  upvote/downvote feature for step 3, and a views counter for step 2.)
+- **Upvote / downvote per puzzle** — thumbs-up / thumbs-down icons shown below
+  each puzzle (play surfaces). Upvotes start at **1**, downvotes at **0** — so a
+  fresh puzzle's total score is **1**. The total score shows on the puzzle's
+  stats page. Anonymous-safe (one vote per player_token, like attempts).
+- **Superuser admin page** — a gated view listing **all** puzzles in the system
+  (every author's), for the superuser. The one place creation/ownership is still
+  account-gated post-ADR-0005.
+
 ### Quick wins (no decisions needed)
 
 - **Richer share payload** — cube + title + direct link in the share sheet

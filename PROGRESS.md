@@ -25,6 +25,24 @@ SMTP creds for forgot-password mail also get filled into the NAS `.env`.
 
 ## Shipped log (most recent first)
 
+- **Dashboard + share-flow QA pass.** Publish now lands the author on the live
+  `/p/:share_token` board with an owner-only **share prompt** ("Look good? Share
+  your puzzle!" + a *Copy puzzle link* button via a new `clipboard` Stimulus
+  controller); the bottom link is owner-aware (*View All My Puzzles* → dashboard,
+  else *← More puzzles*) with breathing room. "Your puzzles" rows rebuilt as
+  **title (caps, links to play/edit) on the left, an action cluster on the right**
+  with inline Heroicon SVGs (`icon` helper): published = Edit · Stats · blue
+  **Unpublish** (eye-slash) · yellow **Share** (copies link) · white **Delete**
+  (trash); draft = a non-clickable dashed **Draft** tag · green **Publish** (eye) ·
+  **Delete**. New color button variants (`--blue`/`--share`/`--go`, `--sm`,
+  `:has(.m-icon)` flex). `+ New puzzle` is a real `link_to new_puzzle_path` (was a
+  broken `button_to` POST), right-aligned. New **Unpublish** action/route;
+  **10-per-page** pagination (dependency-free offset). Topbar `Quartets` runs
+  through `multicolor`. New request specs (unpublish, pagination) + updated
+  author→publish system spec; verified by phone-width screenshots. Three
+  out-of-scope features parked in `TODOS.md` (daily auto-feature, upvote/downvote,
+  superuser admin index). **Note:** the dashboard no longer links JSON Export
+  (per the new row spec) — the route still works; re-add if wanted.
 - **Auth & accounts epic — public creation + cookie ownership + claim-on-signup**
   (ADR-0005, settles D1–D4). Reversed the superuser-only gate: `PuzzlesController`
   is open, ownership is `user_id` **or** a signed permanent `creator_token` cookie
