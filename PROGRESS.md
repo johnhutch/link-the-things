@@ -167,8 +167,7 @@ SMTP creds for forgot-password mail also get filled into the NAS `.env`.
 - **Multicolor re-rolls per load** — dropped the MD5 seed so colors *and* break
   positions re-randomize every call (run length 3–6), killing the "frozen purple"
   look. Server-side, zero JS; an optional `seed:` pins a banding for must-cache
-  headers. Spec flipped determinism → re-roll. (Same branch added `VOICE_heckle.md`
-  — a for-fun "Hutch heckles Jake" persona, not wired into anything.)
+  headers. Spec flipped determinism → re-roll.
 - **Design system (brutalist)** — `_brutal.scss`, Space Grotesk webfonts, a
   `/styleguide` page, and `Multicolor` (the wordmark colorizer). Dropped the
   generated GitHub Actions CI (archive-only repo, no CI/CD).

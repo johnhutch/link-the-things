@@ -48,9 +48,9 @@ Don't relitigate these without a reason — they came out of a full grill-me pas
 
 ## Voice
 
-All comments, docs, commit messages, and public-facing copy follow
-[`VOICE.md`](VOICE.md): confident, pragmatic, grounded, a little swagger, no
-agency fluff. Calibrate by medium — README/UI copy can have personality; code
+All comments, docs, commit messages, and public-facing copy stay confident,
+pragmatic, grounded, a little swagger, no agency fluff. Calibrate by medium —
+README/UI copy can have personality; code
 comments stay useful and terse; commit messages match the casual existing log
 style. Don't shoehorn client-email openers ("Hey there [Name]") into docs that
 have no recipient.
