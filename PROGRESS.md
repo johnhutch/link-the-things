@@ -25,6 +25,17 @@ SMTP creds for forgot-password mail also get filled into the NAS `.env`.
 
 ## Shipped log (most recent first)
 
+- **Game over hides the play controls.** Once the game's won/lost, the
+  shuffle/deselect/submit row is gone (`game_controller` adds `is-over` →
+  `.m-game.is-over .m-game__controls { display: none }`); the post-game share +
+  cube stay. play_spec asserts the controls retire.
+- **Grid-breaking "stamp" — extended the tilted-sticker language.** Added a bigger
+  sibling to `.m-sticker`: **`.m-stamp`** (`--lose` variant) — a loud, tilted,
+  hard-shadow slab for *climactic* moments only. Placed at the **game end-state**
+  (`game_controller` slaps a green "Solved it ↗" / purple "Out of guesses" stamp
+  on the board), the **stats hero** ("N% solve rate"), and the **empty dashboard**
+  ("Make one ↗"). Documented both sticker + stamp in `/styleguide`. play_spec
+  assertions made case-insensitive (stamp uppercases via CSS). 153 green.
 - **Your Puzzles redesign — hierarchy pass.** Replaced the "wall of colored
   buttons" with a title-forward, dense **divided list** (`.m-puzzle-list--dash`,
   no per-row boxes — boxes stay on the public browse list only). Each row now has
