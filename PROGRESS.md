@@ -25,6 +25,27 @@ SMTP creds for forgot-password mail also get filled into the NAS `.env`.
 
 ## Shipped log (most recent first)
 
+- **QA round 4 — completeness-gated draft rows.** A draft row now reflects
+  `Puzzle#complete?`: **incomplete** → an "Edit"-style **Finish** button + a
+  **greyed, un-clickable Publish** (a focusable fake button, not a real form) with
+  a tooltip — *"This puzzle is incomplete! Finish it before publishing."* — shown
+  on hover **and** mobile tap (`:hover` / `:focus-within`); **complete** → an
+  **Edit** button + the real green **Publish**. **Unpublish** recolored **purple**
+  (new `--purple` variant). Dashboard index eager-loads `:groups` to keep
+  `complete?` off the N+1 path. New request specs for both draft states. 150 green.
+- **QA round 3 — authoring flow tweaks.** "Save draft" now returns to the
+  **dashboard** (`/puzzles`) instead of the show page (create+update redirect).
+  Draft rows regained an edit affordance: a blue **Finish editing** button
+  (pencil icon → editor) beside Publish. Authoring form reordered — **Title +
+  Author moved to the top**, with an autosave explainer note above them. The save
+  button now reads **"Save draft" until the puzzle is fully filled out, then
+  "Finish"** — server-rendered via a new `Puzzle#complete?` and kept **live** by
+  the autosave controller (counts the 16 words + 4 categories + title on each
+  keystroke). Topbar fix: **LOG OUT / MY PUZZLES** are now identical uppercase
+  outline buttons (swapped order, `display:contents` on the button_to form so it
+  aligns like the anchors). New `edit` icon. Specs: `Puzzle#complete?` unit tests,
+  draft-row "Finish editing" link, redirect assertions reverted to the dashboard,
+  and the authoring system spec asserts the live "Finish" promotion. 149 green.
 - **QA round 2 — create→show flow, show-page banners, polish.** "Save draft" now
   lands on the puzzle **show page** (create+update redirect to `play_path`);
   `PlayController#show` lets an owner **preview their own draft**. Show header is
