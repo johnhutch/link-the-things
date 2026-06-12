@@ -8,22 +8,27 @@ The durable orientation doc — what an agent must know to work here. Keep it re
 
 A Rails app for creating and playing NYT Connections–style puzzles. It replaces a
 manual Obsidian → swellgarfo workflow that was brutal on an iPhone (the primary
-device). Superusers author puzzles; anyone can play, no login. Full background in
-[`CLAUDE.md`](CLAUDE.md) and [`docs/PLAN.md`](docs/PLAN.md).
+device). **Anyone can author or play — no login.** Accounts (Devise) are optional:
+they let you own and revisit your puzzles across devices (ADR-0005). Full
+background in [`CLAUDE.md`](CLAUDE.md) and [`docs/PLAN.md`](docs/PLAN.md).
 
 ## Stack
 
 Rails 8, Turbo/Stimulus on importmap (no Node build), PostgreSQL. Sass via
 dartsass-rails on Propshaft, organized SMACSS (`app/assets/stylesheets/`, naming
-`l-`/`m-`/`is-`). Devise for auth. RSpec + Capybara, TDD.
+`l-`/`m-`/`is-`). Devise (`registerable` + `recoverable`, no confirmable) for
+optional accounts. RSpec + Capybara, TDD.
 
 ## Dev Setup
 
 Ruby pinned to 4.0.4 (`.ruby-version`); gems install to the default GEM_HOME — plain
 `bundle exec` works, no `BUNDLE_PATH` override (see [Gotchas]). `bin/dev` runs the
 Sass watcher; `bin/rails dartsass:build` builds CSS once. Test DB: `bin/rails db:prepare`.
-Superuser is seeded from `ADMIN_EMAIL` / `ADMIN_PASSWORD` env vars (`db/seeds.rb`,
-idempotent) — never committed.
+An admin account is seeded from `ADMIN_EMAIL` / `ADMIN_PASSWORD` (`db/seeds.rb`,
+idempotent; dev falls back to `admin@example.com` / `password123`) — accounts are
+optional now, but this gives you one to log in with. Forgot-password mail previews
+in dev via `letter_opener`; prod reads SMTP from ENV (`SMTP_*`, `MAILER_SENDER`,
+`APP_HOST`).
 
 ## Domain Glossary
 
@@ -34,15 +39,21 @@ idempotent) — never committed.
 - **Attempt** — one anonymous play-through, keyed by a `player_token` cookie.
 - **share_token** — a puzzle's unguessable public slug; the public play URL is
   `/p/:share_token` (`play#show`).
+- **creator_token** — a signed, permanent cookie that owns a logged-out author's
+  puzzles until they sign in/up (claim-on-auth). Mirrors `player_token`. ADR-0005.
 
 ## Models / key modules
 
 - **Puzzle** (`title`, `author_name`, `status` enum, `share_token` unique,
-  `user_id`). `has_secure_token :share_token`. `has_many :groups` (ordered by
+  `featured` bool, and ownership via **either** `user_id` **or** a `creator_token`
+  cookie). `has_secure_token :share_token`. `has_many :groups` (ordered by
   `position`), `has_many :attempts`, `accepts_nested_attributes_for :groups`,
-  `belongs_to :user`. **All validations are publish-only** — title + the 4×4
-  structural rules (`GROUPS_PER_PUZZLE = 4`, four distinct colors) fire only
-  `if: :published?`. `MAX_MISTAKES = 4`. See ADR 0001.
+  `belongs_to :user, optional: true` (logged-out authors own via the cookie —
+  ADR-0005). **All validations are publish-only** — title + the 4×4 structural
+  rules (`GROUPS_PER_PUZZLE = 4`, four distinct colors) fire only `if: :published?`.
+  `#complete?` (title + 4 groups, each with 4 filled words + a description) drives
+  the editor's "Save draft"→"Finish" label and the Publish gate. `MAX_MISTAKES = 4`.
+  See ADR 0001 + 0005.
 - **Group** (`color` enum, `description`, `position`, `words`). `words` is a
   **jsonb** column (defaults to `[]`) — *not* a PG array, despite the PLAN
   sketch. `WORDS_PER_GROUP = 4`. `#filled_words` strips the blanks the form
@@ -52,11 +63,20 @@ idempotent) — never committed.
   Stats (emoji cube, common wrong guesses) derive from `guesses` — no extra
   tables. Indexed on `player_token`. The public play loop records these (the
   Stimulus `game_controller.js` POSTs to `play_attempts_path`).
-- **PuzzlesController** — `before_action :authenticate_user!`; every query
-  scoped to `current_user` (cross-user access 404s). `publish` is a PATCH member
-  route that flips draft→published. `create`/`update` are autosave-aware (see
-  ADR 0001). `resources :puzzles` defines a `show` route but there's no `show`
-  action/view yet.
+- **PuzzlesController** — **public, no `authenticate_user!`** (ADR-0005). Includes
+  the `Creator` concern; every query is scoped to `owned_puzzles` — `current_user`
+  if signed in, else the signed `creator_token` cookie (`ensure_creator_token`
+  mints it). Cross-owner access 404s. `publish` (PATCH member → redirects to
+  `play_path(…, published: 1)`) and `unpublish` (PATCH member → back to draft) flip
+  status; `create`/`update` are autosave-aware and a manual save redirects to
+  `/puzzles` (see ADR 0001). `resources :puzzles` defines a `show` route but there's
+  no `show` action/view — the public board is `play#show`.
+- **Auth concerns** (`app/controllers/concerns/`) — `Creator` (cookie ownership +
+  `owned_puzzles` + the `owns?` view helper), `ClaimsPuzzles` (site-wide
+  `before_action`: on the first authenticated request, reassigns the cookie's
+  puzzles to the account and clears the cookie), `AnonymousPlayer` (the
+  `player_token` for stats). `PlayController#show` lets an owner preview their own
+  unpublished draft (others 404).
 
 ## Gotchas
 

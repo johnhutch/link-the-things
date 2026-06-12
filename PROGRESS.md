@@ -1,6 +1,6 @@
 # Progress
 
-**Last updated:** 2026-06-10
+**Last updated:** 2026-06-12
 **Active branch:** main
 
 Current state + a rolling shipped-log. Planned/not-started work lives in `TODOS.md`; the *why* behind decisions lives in `DECISIONS.md`.
@@ -25,6 +25,12 @@ SMTP creds for forgot-password mail also get filled into the NAS `.env`.
 
 ## Shipped log (most recent first)
 
+- **Selected tiles lift + tilt (animated).** Picking a tile now plucks it up off
+  the grid and rotates it a little (random −3°…+3° per tile, via a `--tilt` CSS
+  var) with a springy overshoot, instead of pressing down. The motion only worked
+  once selection stopped rebuilding the whole board — `game_controller#toggle`
+  flips `is-selected` on the **live element** (a rebuilt tile pops in
+  already-selected, so a transition has no "before" state). play_spec green.
 - **Game over hides the play controls.** Once the game's won/lost, the
   shuffle/deselect/submit row is gone (`game_controller` adds `is-over` →
   `.m-game.is-over .m-game__controls { display: none }`); the post-game share +
@@ -36,6 +42,13 @@ SMTP creds for forgot-password mail also get filled into the NAS `.env`.
   on the board), the **stats hero** ("N% solve rate"), and the **empty dashboard**
   ("Make one ↗"). Documented both sticker + stamp in `/styleguide`. play_spec
   assertions made case-insensitive (stamp uppercases via CSS). 153 green.
+- **Publish moved into the editor, gated.** On the edit page, **Save draft** and
+  **Publish** now share one centered row — Publish is a second submit on the form
+  via `formaction` → the publish action (forms can't nest). Publish stays **greyed
+  + un-submittable with a tooltip** ("This puzzle is incomplete!…") until
+  `Puzzle#complete?`, kept **live** by the autosave controller; a click while
+  incomplete is `preventDefault`'d. Tooltip shows on hover + mobile-tap, gated by
+  an `.is-blocked` class. New `spec/system/edit_publish_spec.rb`.
 - **Your Puzzles redesign — hierarchy pass.** Replaced the "wall of colored
   buttons" with a title-forward, dense **divided list** (`.m-puzzle-list--dash`,
   no per-row boxes — boxes stay on the public browse list only). Each row now has
@@ -200,5 +213,8 @@ SMTP creds for forgot-password mail also get filled into the NAS `.env`.
   first deploy. Until then prod swallows delivery errors so the app boots clean.
 - **Mobile pass** (real iPhone), **first Synology production deploy** + smoke test,
   and **seeding a first account** — the remaining Phase 0/5 ⬜s.
+- **Tile press feel** — the lift transition (0.22s springy) is shared with the
+  card's `:active` press-scale, so a held press inherits the same easing. Reads
+  fine; split the timings if a press ever feels mushy.
 - `docs/PLAN.md`'s schema sketch calls `Group#words` a "PG array"; it's actually a
   **jsonb** column. Treat jsonb as the truth.
