@@ -101,7 +101,7 @@ feed it and the guess data we get back.
 ## 0004 — Deploy mechanism: build-and-ship over SSH, no CI/CD
 
 **Date:** 2026-06-09
-**Status:** accepted (supersedes the CI/registry parts of 0002)
+**Status:** superseded by 0006
 
 **Context.** 0002 wired a GitHub Action to build the image on GitHub runners,
 push to GHCR, and SSH to the NAS. On reflection the owner doesn't want to depend
@@ -173,6 +173,19 @@ puzzles, which is the intended nudge toward signing up. Existing specs that
 assumed login-gated creation get rewritten. Forgot-password works end-to-end in
 dev now; production needs real SMTP creds in `.env` before reset mail actually
 sends.
+
+---
+
+## 0006 — Deploy: GitHub Actions to GHCR + Synology Container Manager + Watchtower
+
+**Date:** 2026-06-13
+**Status:** accepted (supersedes 0004)
+
+**Context.** The previous deployment strategy (ADR-0004) used a custom `bin/deploy` script that piped image tarballs over SSH to avoid using a container registry. This proved fragile and "harder than it should be" to maintain. Synology's native Container Manager ("Projects") pairs perfectly with standard docker registries.
+
+**Decision.** Eliminate the custom `bin/deploy` script. We now use a **GitHub Actions workflow** (`.github/workflows/deploy.yml`) to automatically build `linux/amd64` images and push them to GitHub Container Registry (GHCR) on every push to `main`. On the Synology NAS, `docker-compose.yml` runs the app alongside **Watchtower**, which periodically polls GHCR and automatically pulls/restarts the `web` container when a new image is found. The existing Cloudflare Tunnel is maintained.
+
+**Consequence.** Deploys rely entirely on standard, automated paths (GHCR and Watchtower). SSH keys and local laptop builds are no longer required. Deployment is now a zero-click experience triggered purely by a git push.
 
 ---
 
