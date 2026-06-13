@@ -8,7 +8,7 @@ A Cloudflare Tunnel securely exposes the app to the internet without opening any
 
 ## Initial Setup on Synology
 
-1. **Install Container Manager** from the Synology Package Center.
+1. **Install Container Manager** from the Synology Package Center. *(Note: If your NAS is running DSM 7.1 or older, the app is called "Docker" and doesn't have the "Project" UI. You should either update your NAS to DSM 7.2 in Control Panel to get the new Container Manager, or you can run `sudo docker-compose up -d` via SSH instead of using the UI.)*
 2. **Make the project dir**, e.g., `/volume1/docker/quartets`, and put the `.env` file in it (copy `.env.example`, fill in real values — `RAILS_MASTER_KEY` is the verbatim contents of `config/master.key`, and include your `TUNNEL_TOKEN`).
 3. **Open Container Manager**:
    - Go to the **Project** tab.
@@ -30,7 +30,7 @@ GitHub Actions will build the new image and push it to GHCR. Within 5 minutes, W
 The `docker-compose.yml` includes a `cloudflared` service. 
 
 - Create a Zero Trust tunnel in the Cloudflare dashboard.
-- Set its public hostname to point to `http://web:80`.
+- Set its public hostname to point to `http://web:3000`.
 - Drop the provided token into your `.env` file as `TUNNEL_TOKEN`.
 
 Traffic will route securely to your NAS without needing Synology's reverse proxy or opening ports.
